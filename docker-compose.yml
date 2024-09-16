@@ -1,0 +1,32 @@
+version: '3.1'
+
+services:
+
+  file_manager_database:
+    container_name: "file-manager-database"
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user
+    ports:
+      - "3306:3306"
+
+    volumes:
+      - ./init/init-db.sql:/docker-entrypoint-initdb.d/dump.sql
+
+# SELECT THE FILE STORAGE TECHNOLOGY OF YOUR DESIRE!
+  my_events_ftp:
+    image: stilliard/pure-ftpd
+    container_name: "file-manager-ftp"
+    ports:
+      - "21:21"
+      - "30000-30009:30000-30009"
+    environment:
+      - "PUBLICHOST=localhost"
+      - "FTP_USER_NAME=user"
+      - "FTP_USER_PASS=password"
+      - "FTP_USER_HOME=/home/ftpusers/user"
+    volumes:
+      - ./docker/files:/home/ftpusers/user
