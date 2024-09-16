@@ -64,8 +64,6 @@ public class FileFtpStorage implements FileStorage {
                 if (!returned) {
                     throw new UploadFileException();
                 }
-            } catch (Exception ex) {
-                throw new UploadFileException();
             } finally {
                 ftpClient.logout();
                 ftpClient.disconnect();

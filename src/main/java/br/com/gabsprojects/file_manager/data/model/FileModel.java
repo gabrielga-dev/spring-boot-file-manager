@@ -15,6 +15,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 @Getter
@@ -54,7 +55,11 @@ public class FileModel {
 
     public FileModel(FileOriginType originType, String originUuid, MultipartFile file) {
         this.name = file.getOriginalFilename();
-        this.filePath = originType.name() + file.getOriginalFilename();
+
+        var filenameParts = Objects.requireNonNull(file.getOriginalFilename()).split("[.]");
+        var fileExtension = filenameParts[filenameParts.length - 1];
+        this.filePath = originType.name() + "/" + this.uuid + "." + fileExtension;
+
         this.originType = originType;
         this.originUuid = originUuid;
     }
