@@ -11,4 +11,6 @@ public interface FilePort {
     ResponseEntity<UuidWrapperResponse> uploadFile(
             FileOriginType origin, @Size(max = 36, min = 36) String originUuid, MultipartFile file
     );
+
+    ResponseEntity<byte[]> getImage(String uuid);
 }
