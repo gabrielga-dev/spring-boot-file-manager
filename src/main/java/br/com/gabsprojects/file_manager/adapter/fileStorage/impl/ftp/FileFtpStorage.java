@@ -1,4 +1,4 @@
-package br.com.gabsprojects.file_manager.adapter.fileStorage.impl;
+package br.com.gabsprojects.file_manager.adapter.fileStorage.impl.ftp;
 
 import br.com.gabsprojects.file_manager.adapter.fileStorage.FileStorage;
 import br.com.gabsprojects.file_manager.business.exception.file.UploadFileException;
@@ -29,21 +29,13 @@ public class FileFtpStorage implements FileStorage {
     private String password;
 
     private FTPClient getClient() throws IOException {
-        try {
-            var ftpClient = new FTPClient();
+        var ftpClient = new FTPClient();
 
-            ftpClient.connect(server, port);
-            ftpClient.login(username, password);
-            ftpClient.enterLocalPassiveMode();
+        ftpClient.connect(server, port);
+        ftpClient.login(username, password);
+        ftpClient.enterLocalPassiveMode();
 
-            return ftpClient;
-        } catch (IOException ex) {
-            log.error(
-                    "Error at logging into FTP server! Username: {} | Password: {} | Server: {} | Port: {}",
-                    username, password, server, port
-            );
-            throw ex;
-        }
+        return ftpClient;
     }
 
     @Override
@@ -70,6 +62,10 @@ public class FileFtpStorage implements FileStorage {
             }
             inputStream.close();
         } catch (IOException ex) {
+            log.error(
+                    "Error at logging into FTP server! Username: {} | Password: {} | Server: {} | Port: {} | Error: {}",
+                    username, password, server, port, ex.getMessage()
+            );
             throw new UploadFileException();
         }
     }

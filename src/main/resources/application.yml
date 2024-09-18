@@ -3,12 +3,18 @@ spring:
     name: file-manager
     file:
       storage:
-        technology: ftp
+        technology: s3
         ftp:
           server: localhost
           port: 21
           username: user
           password: password
+        s3:
+          server: http://localhost:4566/
+          access-key-id: test
+          secret-key: test
+          region: us-east-1
+          bucket-name: file-manager-bucket #same name as the BUCKET_NAME on docker/create_bucket.sh
   jpa:
     database: MYSQL
     show-sql: true
