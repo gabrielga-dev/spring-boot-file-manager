@@ -3,7 +3,7 @@ spring:
     name: file-manager
     file:
       storage:
-        technology: s3
+        technology: ftp
         ftp:
           server: localhost
           port: 21

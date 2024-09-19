@@ -17,19 +17,19 @@ services:
       - ./init/init-db.sql:/docker-entrypoint-initdb.d/dump.sql
 
 # SELECT THE FILE STORAGE TECHNOLOGY OF YOUR DESIRE!
-#  file_manager_ftp:
-#    image: stilliard/pure-ftpd
-#    container_name: "file-manager-ftp"
-#    ports:
-#      - "21:21"
-#      - "30000-30009:30000-30009"
-#    environment:
-#      - "PUBLICHOST=localhost"
-#      - "FTP_USER_NAME=user"
-#      - "FTP_USER_PASS=password"
-#      - "FTP_USER_HOME=/home/ftpusers/user"
-#    volumes:
-#      - ./docker/files:/home/ftpusers/user
+  file_manager_ftp:
+    image: stilliard/pure-ftpd
+    container_name: "file-manager-ftp"
+    ports:
+      - "21:21"
+      - "30000-30009:30000-30009"
+    environment:
+      - "PUBLICHOST=localhost"
+      - "FTP_USER_NAME=user"
+      - "FTP_USER_PASS=password"
+      - "FTP_USER_HOME=/home/ftpusers/user"
+    volumes:
+      - ./docker/files:/home/ftpusers/user
   file_manager_localstack:
     image: localstack/localstack:latest
     container_name: "file-manager-s3"

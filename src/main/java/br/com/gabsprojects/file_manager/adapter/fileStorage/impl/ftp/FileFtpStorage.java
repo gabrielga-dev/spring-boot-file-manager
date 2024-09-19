@@ -1,6 +1,7 @@
 package br.com.gabsprojects.file_manager.adapter.fileStorage.impl.ftp;
 
 import br.com.gabsprojects.file_manager.adapter.fileStorage.FileStorage;
+import br.com.gabsprojects.file_manager.business.exception.file.RetrieveFileException;
 import br.com.gabsprojects.file_manager.business.exception.file.UploadFileException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +41,25 @@ public class FileFtpStorage implements FileStorage {
 
     @Override
     public byte[] getFile(String remoteFilePath) {
-        return new byte[0];
+        try {
+            var ftpClient = getClient();
+            try {
+                ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+
+                var inputStream = ftpClient.retrieveFileStream(remoteFilePath);
+
+                return inputStream.readAllBytes();
+            } catch (Exception ex) {
+                log.error("Error at finding file: {}", ex.getMessage());
+                throw new RetrieveFileException();
+            } finally {
+                ftpClient.logout();
+                ftpClient.disconnect();
+            }
+        } catch (IOException ex) {
+            log.error("Error at logging in/out or disconnecting from FTP server");
+            throw new RetrieveFileException();
+        }
     }
 
     @Override
