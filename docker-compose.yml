@@ -17,7 +17,7 @@ services:
       - ./init/init-db.sql:/docker-entrypoint-initdb.d/dump.sql
 
 # SELECT THE FILE STORAGE TECHNOLOGY OF YOUR DESIRE!
-  my_events_ftp:
+  file_manager_ftp:
     image: stilliard/pure-ftpd
     container_name: "file-manager-ftp"
     ports:
@@ -30,3 +30,21 @@ services:
       - "FTP_USER_HOME=/home/ftpusers/user"
     volumes:
       - ./docker/files:/home/ftpusers/user
+  file_manager_localstack:
+    image: localstack/localstack:latest
+    container_name: "file-manager-s3"
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3
+      - AWS_REGION=us-east-1
+      - DEFAULT_REGION=us-east-1
+      - AWS_DEFAULT_REGION=us-east-1
+      - DEBUG=1
+      - DATA_DIR=/tmp/
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+    volumes:
+      - ./docker:/docker-entrypoint-initaws.d:ro
+      - ./docker:/etc/localstack/init/ready.d
+      - ./docker/files:/tmp/

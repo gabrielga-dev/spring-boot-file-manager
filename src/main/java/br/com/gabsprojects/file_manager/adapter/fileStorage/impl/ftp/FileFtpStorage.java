@@ -1,6 +1,7 @@
-package br.com.gabsprojects.file_manager.adapter.fileStorage.impl;
+package br.com.gabsprojects.file_manager.adapter.fileStorage.impl.ftp;
 
 import br.com.gabsprojects.file_manager.adapter.fileStorage.FileStorage;
+import br.com.gabsprojects.file_manager.business.exception.file.RetrieveFileException;
 import br.com.gabsprojects.file_manager.business.exception.file.UploadFileException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,26 +30,36 @@ public class FileFtpStorage implements FileStorage {
     private String password;
 
     private FTPClient getClient() throws IOException {
-        try {
-            var ftpClient = new FTPClient();
+        var ftpClient = new FTPClient();
 
-            ftpClient.connect(server, port);
-            ftpClient.login(username, password);
-            ftpClient.enterLocalPassiveMode();
+        ftpClient.connect(server, port);
+        ftpClient.login(username, password);
+        ftpClient.enterLocalPassiveMode();
 
-            return ftpClient;
-        } catch (IOException ex) {
-            log.error(
-                    "Error at logging into FTP server! Username: {} | Password: {} | Server: {} | Port: {}",
-                    username, password, server, port
-            );
-            throw ex;
-        }
+        return ftpClient;
     }
 
     @Override
     public byte[] getFile(String remoteFilePath) {
-        return new byte[0];
+        try {
+            var ftpClient = getClient();
+            try {
+                ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
+
+                var inputStream = ftpClient.retrieveFileStream(remoteFilePath);
+
+                return inputStream.readAllBytes();
+            } catch (Exception ex) {
+                log.error("Error at finding file: {}", ex.getMessage());
+                throw new RetrieveFileException();
+            } finally {
+                ftpClient.logout();
+                ftpClient.disconnect();
+            }
+        } catch (IOException ex) {
+            log.error("Error at logging in/out or disconnecting from FTP server");
+            throw new RetrieveFileException();
+        }
     }
 
     @Override
@@ -70,6 +81,10 @@ public class FileFtpStorage implements FileStorage {
             }
             inputStream.close();
         } catch (IOException ex) {
+            log.error(
+                    "Error at logging into FTP server! Username: {} | Password: {} | Server: {} | Port: {} | Error: {}",
+                    username, password, server, port, ex.getMessage()
+            );
             throw new UploadFileException();
         }
     }
